@@ -9,7 +9,6 @@ string printCell(string value, int pos, bool isHeader);
 bool checkNotOutBound(int n);
 void drawColumnsHeader();
 void drawRowHeader(int i);
-void showSheet(int n, int m);
 void initList();
 bool showMenu();
 bool showMainMenu();
@@ -27,11 +26,19 @@ struct Node
 typedef Node<string> COLUMN;
 typedef Node<COLUMN> ROW;
 
-// Aqui empieza la lista, es la primera fila.
+// Aqui empieza la lista, la posicion 0,0.
 ROW *multilist = new ROW();
 
+/*
+	Se podria decir que estas posiciones desde cual se van a imprimir los datos  
+*/
+ROW *start_row;
+COLUMN *start_col;
 
-//Crea la lista con los datos
+//MODIFICAR ESTA POS DE MEMORIA PARA CAMBIAR LA CELDA SELECCIONADA 
+COLUMN *selected_cell;
+
+// Crea la lista con los datos
 void initList()
 {
 
@@ -59,9 +66,9 @@ void initList()
 		for (int j = 0; j < LIMIT; j++)
 		{
 
-			//TODO: AQUI EL VALOR DE LA 
-			//col->value = new string(to_string(i * 25 + j));
-			col->value = new string("");
+			// TODO: AQUI EL VALOR DE LA
+			col->value = new string(to_string(i * 25 + j));
+			// col->value = new string("");
 			col->back = col;
 			col->next = new COLUMN();
 			col = col->next;
@@ -69,78 +76,79 @@ void initList()
 		row = row->next;
 		col = row->value;
 	}
+
+	start_row = multilist;
+	start_col = start_row->value;
 }
 
 /*
-Imprime la multilist en formato hoja de calculo 
+Imprime la multilist en formato hoja de calculo
 */
-void showSheet(int n, int m)
+void showSheet(COLUMN *col_mem, ROW *row_mem, int n, int m)
 {
-    /*
-    Test
-    
-    cout << checkNotOutBound(n) << "\n";
-    cout << checkNotOutBound(m) << "\n";
-    */
-    
-    if(checkNotOutBound(n)){
-        n = LIMIT-SHOWLIMIT;
-    }
-    
-    if(checkNotOutBound(m)){
-        m = LIMIT-SHOWLIMIT;
-    }
-    
-	ROW *row = multilist;
-	COLUMN *col = row->value;
+	/*
+	Test
+
+	cout << checkNotOutBound(n) << "\n";
+	cout << checkNotOutBound(m) << "\n";
+	*/
+
+	string BG;
+
+	if (checkNotOutBound(n))
+	{
+		n = LIMIT - SHOWLIMIT;
+	}
+
+	if (checkNotOutBound(m))
+	{
+		m = LIMIT - SHOWLIMIT;
+	}
+
+	ROW *row = row_mem;
+	COLUMN *col = col_mem;
 
 	drawColumnsHeader(n, m);
 
-	for (int i = 0; i < n + SHOWLIMIT; i++)
+	for (int i = 0; i < SHOWLIMIT; i++)
 	{
-    	// Esto viajará hasta la fila n y empezará a mostrar a partir de esos datos
-    	if (i < n)
-    	{
-    		row = row->next;
-    		col = row->value;
-    		continue;
-    	}
-    	
-		drawRowHeader(i);
+		drawRowHeader(i + n);
 
-        cout << RESET_FONT;
+		cout << RESET_FONT;
 		if (i % 2 == 0)
 		{
 			// Establecer el color de fondo en verde para las filas pares
-			cout << BG_GREEN;
+			BG = BG_GREEN;
 		}
 		else
 		{
 			// Establecer el color de fondo en blanco para las filas impares
-			cout << BG_WHITE;
+			BG = BG_WHITE;
 		}
 
+		cout << BG;
 		cout << BLACK_FONT; // Texto negro
 
 		/*
 		Dibuja la celda con los valores de la multilist
 		*/
-		for (int j = 0; j < m + SHOWLIMIT; j++)
+		for (int j = 0; j < SHOWLIMIT; j++)
 		{
-
-			// Esto viajará hasta la celda y empezará a mostrar a partir de esos datos
-			if (j < m)
-			{
-				col = col->next;
-				continue;
-			}
-
 			string val = *(col->value);
-			cout << printCell(val, 0, false);
+			if (selected_cell == col)
+			{
+				cout << BG_YELLOW;
+				cout << printCell(val, 0, false);
+				cout << BG;
+			}
+			else
+			{
+				cout << printCell(val, 0, false);
+			}
 			col = col->next;
 		}
 
-		cout << RESET_FONT  <<  "\n";
+		cout << RESET_FONT << "\n";
 
 		// Avanzamos a la siguiente fila y nos posicionamos en la primera columna
 		row = row->next;
@@ -150,9 +158,9 @@ void showSheet(int n, int m)
 	cout << "\n\n\n";
 }
 
-
-bool showMainMenu(){
-    cout << RESET_FONT;
+bool showMainMenu()
+{
+	cout << RESET_FONT;
 	bool salir = false;
 	int option;
 	cout << "Opciones para hoja de calculo" << endl;
@@ -162,33 +170,33 @@ bool showMainMenu(){
 	cout << " Escoge una opcion: ";
 	cin >> option;
 	cin.ignore();
-    
+
 	switch (option)
 	{
 	case 1:
-	    //Inicia la lista vacia
-	    initList();
-        salir = true;
+		// Inicia la lista vacia
+		initList();
+		salir = true;
 
 		break;
-		
+
 	case 2:
-	    //TODO: Funcion abrir desde json
+		// TODO: Funcion abrir desde json
 		break;
-	
+
 	case 3:
 		return NULL;
 		break;
 	default:
 		break;
 	}
-	
+
 	cout << "\n\n\n";
 
 	return salir;
 }
 
-//TODO: Implementar todas las funciones y darle estilo :|
+// TODO: Implementar todas las funciones y darle estilo :|
 bool showMenu()
 {
 
@@ -245,31 +253,31 @@ bool showMenu()
 
 int main()
 {
-	//Por defecto las consolas de windows no muestran los colores
-    enableColorsWindows();
+	// Por defecto las consolas de windows no muestran los colores
+	enableColorsWindows();
 
-    //Hay dos menus que se muestran de forma consecutiva
+	// Hay dos menus que se muestran de forma consecutiva
 	bool salir = false;
 	bool close = false;
-	
-    do
+
+	do
 	{
 
 		salir = showMainMenu();
-		if(salir == NULL){
+		if (salir == NULL)
+		{
 			return 0;
 		}
-		
+
 	} while (!salir);
 
-    
+	selected_cell = start_row->next->next->value->next->next->next;
 	do
 	{
 		salir = showMenu();
-		showSheet(row_pos, col_pos);
+		showSheet(start_col, start_row, ROW_POS, COL_POS);
 
 	} while (!salir);
-
 
 	return 0;
 }

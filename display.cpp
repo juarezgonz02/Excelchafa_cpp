@@ -4,21 +4,22 @@
 using namespace std;
 
 /*
-	No sé como funciona esto, pero habilita los colores en cualquier consola  Windows
+	No sé como funciona esto, pero habilita los colores en cualquier consola Windows
 	no tocar xd
 */
 void enableColorsWindows();
 
-void enableColorsWindows() {
-    // Habilitar el procesamiento de códigos de escape ANSI en Windows
-    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    DWORD dwMode = 0;
-    GetConsoleMode(hOut, &dwMode);
-    dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-    SetConsoleMode(hOut, dwMode);
+void enableColorsWindows()
+{
+	// Habilitar el procesamiento de códigos de escape ANSI en Windows
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	DWORD dwMode = 0;
+	GetConsoleMode(hOut, &dwMode);
+	dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+	SetConsoleMode(hOut, dwMode);
 }
 
-//Colores para los fuentes de letras y el color del fondo
+// Colores para los fuentes de letras y el color del fondo
 #define RESET_FONT "\033[0m"
 #define BLACK_FONT "\033[30m"
 #define RED_FONT "\033[31m"
@@ -49,26 +50,22 @@ void enableColorsWindows() {
 string COLSHEADER = "ABCDEFGHIJKLMNOPQRSTUVWXY";
 
 // Variables para controlar cuantas celdas se muestran y donde está la seleccionada
-int row_pos = 0, col_pos = 0, SHOWLIMIT = 9;
+int ROW_POS = 0, COL_POS = 0, SHOWLIMIT = 9;
 
 string printCell(string value, int pos, bool isHeader);
 bool checkNotOutBound(int n);
 void drawColumnsHeader();
 void drawRowHeader(int i);
-void showSheet(int n, int m);
-void initList();
-bool showMenu();
-bool showMainMenu();
 
 /*
-    Las especificaciones decian que las celdas deben tener 8 caracteres maximo, entonces, 
-    a un espacio vacio de 8 caracteres, le remplazo una porcion en una posicion especifica 
-    con el texto que queremos mostrar, así siempre hay el mismo tamaño
+	Las especificaciones decian que las celdas deben tener 8 caracteres maximo, entonces,
+	a un espacio vacio de 8 caracteres, le remplazo una porcion en una posicion especifica
+	con el texto que queremos mostrar, así siempre hay el mismo tamaño
 */
 string printCell(string value, int pos, bool isHeader)
 {
-    
-    //TODO: VALIDAR QUE SIEMPRE HAYAN 8 caracteres EN EL VALOR DE LA CELDA A MOSTRAR
+
+	// TODO: VALIDAR QUE SIEMPRE HAYAN 8 caracteres EN EL VALOR DE LA CELDA A MOSTRAR
 	string val = value;
 	string cel = "        ";
 
@@ -82,8 +79,7 @@ string printCell(string value, int pos, bool isHeader)
 	}
 }
 
-
-//Solo imprimen las cabeceras
+// Solo imprimen las cabeceras
 void drawColumnsHeader(int n, int m)
 {
 
@@ -107,9 +103,9 @@ void drawRowHeader(int i)
 }
 ///////////////////////////////
 
-//Hay un limite para el espacio de la multilist, de 25 items, si se pasa, muestra una excepcion
+// Hay un limite para el espacio de la multilist, de 25 items, si se pasa, muestra una excepcion
 
-bool checkNotOutBound(int n){
-    return n > 25 - SHOWLIMIT;
+bool checkNotOutBound(int n)
+{
+	return n > 25 - SHOWLIMIT;
 }
-
