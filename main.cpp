@@ -2,6 +2,8 @@
 #include <string>
 #include <Windows.h>
 #include "display.cpp"
+#include "saves.cpp"
+//#include "data.cpp"
 
 using namespace std;
 
@@ -13,18 +15,6 @@ void initList();
 bool showMenu();
 bool showMainMenu();
 
-// Declaracion de la estructura de nodo
-template <typename T>
-struct Node
-{
-	T *value;
-	Node<T> *next;
-	Node<T> *back;
-};
-
-// Le damos un alias a las estructuras para facilitar lectura
-typedef Node<string> COLUMN;
-typedef Node<COLUMN> ROW;
 
 // Aqui empieza la lista, la posicion 0,0.
 ROW *multilist = new ROW();
@@ -32,8 +22,7 @@ ROW *multilist = new ROW();
 /*
 	Se podria decir que estas posiciones desde cual se van a imprimir los datos  
 */
-ROW *start_row;
-COLUMN *start_col;
+ROW *start_row; COLUMN *start_col;
 
 //MODIFICAR ESTA POS DE MEMORIA PARA CAMBIAR LA CELDA SELECCIONADA 
 COLUMN *selected_cell;
@@ -67,8 +56,8 @@ void initList()
 		{
 
 			// TODO: AQUI EL VALOR DE LA
-			col->value = new string(to_string(i * 25 + j));
-			// col->value = new string("");
+			//col->value = new string(to_string(i * 25 + j));
+			col->value = new string("");
 			col->back = col;
 			col->next = new COLUMN();
 			col = col->next;
@@ -182,6 +171,11 @@ bool showMainMenu()
 
 	case 2:
 		// TODO: Funcion abrir desde json
+		showFiles();
+		initWithData(multilist);
+		start_row = multilist;
+		start_col = start_row->value;
+		salir = true;
 		break;
 
 	case 3:
@@ -240,6 +234,7 @@ bool showMenu()
 	case 9:
 		break;
 	case 10:
+		save(multilist, LIMIT);
 		break;
 	case 11:
 		salir = true;
@@ -271,7 +266,7 @@ int main()
 
 	} while (!salir);
 
-	selected_cell = start_row->next->next->value->next->next->next;
+	selected_cell = start_row->value;
 	do
 	{
 		salir = showMenu();
