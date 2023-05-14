@@ -191,6 +191,113 @@ bool showMainMenu()
 }
 
 // TODO: Implementar todas las funciones y darle estilo :|
+
+// Funcion para seleccionar una celda a traves de la fila y columna ingresado por el usuario
+void selectPositionCell(int n, int m, char colLetter)
+{	
+	// Definimos los punteros de la fila y columna
+	ROW *row = start_row;
+	COLUMN *col = start_col;
+
+	// Verificamos que la celda seleccionado por el usuario se encuentre dentro del rango de la hoja de calculo
+	if(checkNotOutBound(n) || checkNotOutBound(m)){
+		cout << "La celda " << colLetter << n << " seleccionada no existe \n";
+		return;
+	}
+
+	// Verificamos que no se pueda seleccionar una celda de tipo cabecera 
+	if (n == 0)
+	{
+		cout << "La celda " << colLetter << n << " seleccionada no existe \n";
+		cout << "------------------------------------------------------------ \n";
+		return;
+	}
+
+	// Recorremos las filas guardando el valor de la columna 
+	for (int i = 1; i < n; i++)
+	{
+		row = row->next;
+		col = row->value;
+	}
+	// Recorremos ahora las columnas hasta la que el usuario ingreso
+	for (int i = 1; i < m; i++)
+	{
+		col = col->next;
+	}
+
+	// Mostramos por consola la cela seleccionado y su valor actual
+	cout << "Celda seleccionada: " << colLetter << n << " Valor: " << *(col->value) << "\n";
+	cout << "------------------------------------------------------------\n";
+	// Asignamos la celda seleccionada a la variable global selected_cell 
+	selected_cell = col;
+}
+
+// creamos la funcion para que el usuario ingrese la fila y columna a seleccionar
+void selectionCellPosition()
+{	
+	// definimos las variables para guardar la fila y columna ingresado por el usuario en este caso un char y un int
+	char colLetter;
+	int row;
+
+	cout << "-------------------------------------------------- \n";
+
+	// validamos a traves de un ciclo do while que el usuario ingrese una letra mayuscula que representa la columna que quiere seleccionar
+	do
+	{
+		cout << "Ingrese la columna que quiere seleccionar: ";
+		cin >> colLetter;
+		if (colLetter < 65 || colLetter > 90)
+		{
+			cout << "-------------------------------------------------- \n";
+			cout << "Error! Ingrese una letra mayuscula\n";
+			cout << "-------------------------------------------------- \n";
+		}
+	} while (colLetter < 65 || colLetter > 90);
+	
+	// Verificamos que el usuario ingrese una fila positiva 
+	do{
+		cout << "Ingrese la fila que quiere seleccionar: ";
+		cin >> row;
+		cout << "-------------------------------------------------- \n";
+		if(row <0 ){
+			cout << "Error! Ingrese un numero positivo \n";
+			cout << "-------------------------------------------------- \n";
+		}
+	}while(row < 0);
+
+	// asignamos el valor de la fila a la varibale n
+	int n = row;
+	// convertimos el caracter a su respectivo valor ascii y le restamos 64 para obtener el valor de la columna
+	int m = int(colLetter) - 64;
+
+	// Finalmente pasamos los valores de la fila y columna a la funcion selectPositionCell 
+	selectPositionCell(n, m, colLetter);
+}
+
+
+// Funcion para ingresar un valor a la celda que este seleccionado en ese momento
+void insertIntoCell()
+{	
+	// Definimos un string para obtener el valor que quiere ingresar el usuario
+	string value;
+
+	// Verificamos que el usuario ingrese como maximo 8 caracteres
+	cout << "-------------------------------------------------- \n";
+	do{
+		cout << "Ingrese el valor que quiere escribir en la celda: ";
+		cin >> value;
+		if(value.length() > 8){
+			cout << "-------------------------------------------------- \n";
+			cout << "Error! Ingrese como maximo 8 caracteres \n";
+			cout << "-------------------------------------------------- \n";
+		}
+	}while(value.length() > 8);
+
+	cout << "-------------------------------------------------- \n";
+	// Asignamos el valor a la celda seleccionada a traves de la variable global selected_cell accediendo al puntero value 
+	*(selected_cell->value) = value;
+}
+
 bool showMenu()
 {
 
@@ -217,7 +324,9 @@ bool showMenu()
 	{
 	case 1:
 		break;
+		insertIntoCell();
 	case 2:
+		selectionCellPosition();
 		break;
 	case 3:
 		break;
