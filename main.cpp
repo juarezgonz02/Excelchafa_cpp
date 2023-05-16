@@ -28,6 +28,9 @@ COLUMN *start_col;
 // MODIFICAR ESTA POS DE MEMORIA PARA CAMBIAR LA CELDA SELECCIONADA
 COLUMN *selected_cell;
 
+//variables utilizadas para copiar, cortar y pegar
+string clipboard = "";
+
 // Crea la lista con los datos
 void initList()
 {
@@ -373,6 +376,25 @@ void insertIntoCell()
 	*(selected_cell->value) = value;
 }
 
+// Funcion para copiar una celda
+void copyCell(){
+	//Se guarda el portapapeles el valor seleccionado
+	clipboard = *(selected_cell->value);
+}
+
+// Funcion para pegar datos en una celda
+void pageCell(){
+	//Asignamos el valor del portapapeles en la celda
+	*(selected_cell->value) = clipboard;
+}
+
+// Funcionar para cortar datos de una celda
+void cutCell(){
+	//Cortamos el valor de la celda y se guarda en portapapeles
+	copyCell();
+	*(selected_cell->value) = "";
+}
+
 bool showMenu()
 {
 
@@ -404,10 +426,13 @@ bool showMenu()
 		selectionCellPosition();
 		break;
 	case 3:
+		copyCell();
 		break;
 	case 4:
+		cutCell();
 		break;
 	case 5:
+		pageCell();
 		break;
 	case 6:
 		break;
