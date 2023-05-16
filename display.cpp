@@ -49,11 +49,11 @@ void enableColorsWindows()
 #define LIMIT 25
 string COLSHEADER = "ABCDEFGHIJKLMNOPQRSTUVWXY";
 
-// Variables para controlar cuantas celdas se muestran y donde está la seleccionada
-int ROW_POS = 0, COL_POS = 0, SHOWLIMIT = 9;
+// Variables para controlar cuantas celdas se muestran y donde está la seleccionada 
+int ROW_POS = 0, COL_POS = 0, SHOWLIMIT = 5;
 
 string printCell(string value, int pos, bool isHeader);
-bool checkNotOutBound(int n);
+bool checkNotOutShowingBound(int n);
 void drawColumnsHeader();
 void drawRowHeader(int i);
 
@@ -105,7 +105,9 @@ void drawRowHeader(int i)
 
 // Hay un limite para el espacio de la multilist, de 25 items, si se pasa, muestra una excepcion
 
-bool checkNotOutBound(int n)
+bool checkNotOutShowingBound(int n)
 {
 	return n > 25 - SHOWLIMIT;
 }
+
+//

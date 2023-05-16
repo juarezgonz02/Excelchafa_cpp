@@ -133,6 +133,8 @@ void initWithData(ROW* data){
 	/*
 		Crear el cada nodo y avanzar
 	*/
+    #define LIMIT 25
+    
 	for (int i = 0; i < LIMIT; i++)
 	{
 
