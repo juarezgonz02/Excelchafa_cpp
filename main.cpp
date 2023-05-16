@@ -38,27 +38,21 @@ void initList()
 	ROW *row = multilist;
 
 	/*
+		Crear el primer nodo
+	*/
+	row->back = NULL;
+	row->value = new COLUMN();
+
+	/*
 		Crear el cada nodo y avanzar
 	*/
 	for (int i = 0; i < LIMIT; i++)
 	{
 
 		// Inicializar los nodos
-		row->next = new ROW();
 		row->value = new COLUMN();
-
-		if (i == 0)
-		{
-			/*
-				Crear el primer nodo
-			*/
-			row->back = NULL;
-		}
-		else
-		{
-			row->next->back = row;
-		}
-
+		row->next = new ROW();
+		row->back = row;
 		COLUMN *col = row->value;
 
 		// Inicializar las columnas y llenarlas
@@ -66,24 +60,13 @@ void initList()
 		{
 
 			// TODO: AQUI EL VALOR DE LA
-			col->value = new string(to_string(i * 25 + j));
-			// col->value = new string("");
+			//col->value = new string(to_string(i * 25 + j));
+			col->value = new string("");
+			col->back = col;
 			col->next = new COLUMN();
-
-			if (j == 0)
-			{
-				/*
-					Crear el primer nodo
-				*/
-				col->back = NULL;
-			}
-			else
-			{
-				col->next->back = col;
-			}
-
 			col = col->next;
 		}
+
 		row = row->next;
 		col = row->value;
 	}
