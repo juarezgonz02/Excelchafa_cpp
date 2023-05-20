@@ -1,15 +1,15 @@
 #include <iostream>
 #include <string>
-#include <Windows.h>
+//#include <Windows.h>
 using namespace std;
 
 /*
 	No sé como funciona esto, pero habilita los colores en cualquier consola Windows
 	no tocar xd
 */
-void enableColorsWindows();
+//void enableColorsWindows();
 
-void enableColorsWindows()
+/*void enableColorsWindows()
 {
 	// Habilitar el procesamiento de códigos de escape ANSI en Windows
 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -17,7 +17,7 @@ void enableColorsWindows()
 	GetConsoleMode(hOut, &dwMode);
 	dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 	SetConsoleMode(hOut, dwMode);
-}
+}*/
 
 // Colores para los fuentes de letras y el color del fondo
 #define RESET_FONT "\033[0m"

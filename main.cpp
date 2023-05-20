@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include <Windows.h>
+//#include <Windows.h>
 #include "display.cpp"
 #include "saves.cpp"
 
@@ -378,6 +378,67 @@ void cutCell(){
 	*(selected_cell->value) = "";
 }
 
+void moveCellUp()
+{
+    // Verificar si la celda actual está en la primera fila
+    if (ROW_POS == 1)
+    {
+        return;
+    }
+
+    // Mover la celda hacia arriba
+    start_row = start_row->back;
+    ROW_POS--;
+
+    // Actualizar la celda seleccionada
+    selected_cell = selected_cell->back;
+}
+
+
+void moveCellRight()
+{
+    // Verificar si la celda actual tiene una siguiente fila
+    if (selected_cell->next!= nullptr)
+    {
+        // Mover a la siguiente fila
+        selected_cell = selected_cell->next;
+        COL_POS++;
+    }
+}
+
+void moveCellLeft()
+{
+    
+      if (selected_cell->back != nullptr)
+    {
+        // Mover a la columna anterior
+        selected_cell = selected_cell->back;
+        COL_POS--;
+    }
+    else
+    {
+        // Si no hay columna anterior, verificar si hay una fila anterior
+        if (selected_cell->back != nullptr)
+        {
+            // Mover a la fila anterior y situarse en la última columna
+            selected_cell = selected_cell->back;
+            COL_POS--;
+            ROW_POS--;
+        }
+    }
+}
+
+void moveCellDown()
+{
+       // Mover la celda hacia arriba
+    start_row = start_row->back;
+    ROW_POS++;
+
+    // Actualizar la celda seleccionada
+    selected_cell = selected_cell->back;
+}
+
+
 bool showMenu()
 {
 
@@ -418,12 +479,16 @@ bool showMenu()
 		pageCell();
 		break;
 	case 6:
+	    moveCellLeft();
 		break;
 	case 7:
+		moveCellRight();
 		break;
 	case 8:
+		moveCellUp();
 		break;
 	case 9:
+	    moveCellDown();
 		break;
 	case 10:
 		save(multilist, LIMIT);
@@ -442,7 +507,7 @@ bool showMenu()
 int main()
 {
 	// Por defecto las consolas de windows no muestran los colores
-	enableColorsWindows();
+//	enableColorsWindows();
 
 	// Hay dos menus que se muestran de forma consecutiva
 	bool salir = false;
