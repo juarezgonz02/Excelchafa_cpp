@@ -1,15 +1,14 @@
 #include <iostream>
 #include <string>
-//#include <Windows.h>
+#include <Windows.h>
 using namespace std;
 
 /*
-	No sé como funciona esto, pero habilita los colores en cualquier consola Windows
-	no tocar xd
+	Habilita los colores en cualquier consola Windows desde windows 10
 */
-//void enableColorsWindows();
+void enableColorsWindows();
 
-/*void enableColorsWindows()
+void enableColorsWindows()
 {
 	// Habilitar el procesamiento de códigos de escape ANSI en Windows
 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -17,7 +16,7 @@ using namespace std;
 	GetConsoleMode(hOut, &dwMode);
 	dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 	SetConsoleMode(hOut, dwMode);
-}*/
+}
 
 // Colores para los fuentes de letras y el color del fondo
 #define RESET_FONT "\033[0m"
@@ -49,8 +48,8 @@ using namespace std;
 #define LIMIT 25
 string COLSHEADER = "ABCDEFGHIJKLMNOPQRSTUVWXY";
 
-// Variables para controlar cuantas celdas se muestran y donde está la seleccionada 
-int ROW_POS = 0, COL_POS = 0, SHOWLIMIT = 5;
+// Variables para controlar cuantas celdas se muestran y donde desde donde se están mostrando los header de filas y columnas
+int SHOW_FROM_ROW = 0, SHOW_FROM_COL = 0, SHOWLIMIT = 5;
 
 string printCell(string value, int pos, bool isHeader);
 bool checkNotOutShowingBound(int n);

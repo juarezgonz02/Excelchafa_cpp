@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-//#include <Windows.h>
 #include "display.cpp"
 #include "saves.cpp"
 
@@ -28,7 +27,7 @@ COLUMN *start_col;
 // MODIFICAR ESTA POS DE MEMORIA PARA CAMBIAR LA CELDA SELECCIONADA
 COLUMN *selected_cell;
 
-//variables utilizadas para copiar, cortar y pegar
+// variables utilizadas para copiar, cortar y pegar
 string clipboard = "";
 
 // Crea la lista con los datos
@@ -40,8 +39,8 @@ void initList()
 	/*
 		Crear el primer nodo
 	*/
-	row->back = NULL;
-	row->value = new COLUMN();
+	row->back = nullptr;
+	// row->value->back = nullptr;
 
 	/*
 		Crear el cada nodo y avanzar
@@ -53,6 +52,7 @@ void initList()
 		row->value = new COLUMN();
 		row->next = new ROW();
 		row->back = row;
+
 		COLUMN *col = row->value;
 
 		// Inicializar las columnas y llenarlas
@@ -60,17 +60,28 @@ void initList()
 		{
 
 			// TODO: AQUI EL VALOR DE LA
-			//col->value = new string(to_string(i * 25 + j));
+			// col->value = new string(to_string(i * 25 + j));
 			col->value = new string("");
-			col->back = col;
-			col->next = new COLUMN();
-			col = col->next;
+
+			if (j == 0)
+			{
+				col->back = nullptr;
+			}
+
+			if(j == LIMIT-1){
+				col->next = nullptr;
+			}else{
+				col->next = new COLUMN();
+				col->next->back = col;
+				col = col->next;
+			}
 		}
 
 		row = row->next;
 		col = row->value;
 	}
 
+	row -> next = nullptr; 
 	start_row = multilist;
 	start_col = start_row->value;
 }
@@ -107,7 +118,7 @@ void showSheet(COLUMN *col_mem, ROW *row_mem, int n, int m)
 	for (int i = 0; i < SHOWLIMIT; i++)
 	{
 
-		for (int k = 0; k < COL_POS; k++)
+		for (int k = 0; k < SHOW_FROM_COL; k++)
 		{
 			col = col->next;
 		}
@@ -293,8 +304,8 @@ void selectPositionCell(int row_move, int col_move, char colLetter)
 void changeSelectedCell(COLUMN *col, int row_move, int col_move)
 {
 	// checkIfIsVisible()
-	bool ROWVISIBLE = ROW_POS < row_move && row_move < ROW_POS + SHOWLIMIT;
-	bool COLVISIBLE = COL_POS < col_move && col_move < COL_POS + SHOWLIMIT;
+	bool ROWVISIBLE = SHOW_FROM_ROW < row_move && row_move < SHOW_FROM_ROW + SHOWLIMIT;
+	bool COLVISIBLE = SHOW_FROM_COL < col_move && col_move < SHOW_FROM_COL + SHOWLIMIT;
 	selected_cell = col;
 
 	if (!(ROWVISIBLE && COLVISIBLE))
@@ -304,16 +315,16 @@ void changeSelectedCell(COLUMN *col, int row_move, int col_move)
 			row_move = LIMIT - SHOWLIMIT;
 		}
 
-		if (ROW_POS < row_move)
+		if (SHOW_FROM_ROW < row_move)
 		{
-			for (int i = 0; i < row_move - ROW_POS; i++)
+			for (int i = 0; i < row_move - SHOW_FROM_ROW; i++)
 			{
 				start_row = start_row->next;
 			}
 		}
 		else
 		{
-			for (int i = 0; i < ROW_POS - row_move; i++)
+			for (int i = 0; i < SHOW_FROM_ROW - row_move; i++)
 			{
 				start_row = start_row->back;
 			}
@@ -329,8 +340,8 @@ void changeSelectedCell(COLUMN *col, int row_move, int col_move)
 			start_col = col;
 		}
 
-		ROW_POS = row_move;
-		COL_POS = col_move;
+		SHOW_FROM_ROW = row_move;
+		SHOW_FROM_COL = col_move;
 	}
 }
 
@@ -360,84 +371,85 @@ void insertIntoCell()
 }
 
 // Funcion para copiar una celda
-void copyCell(){
-	//Se guarda el portapapeles el valor seleccionado
+void copyCell()
+{
+	// Se guarda el portapapeles el valor seleccionado
 	clipboard = *(selected_cell->value);
 }
 
 // Funcion para pegar datos en una celda
-void pageCell(){
-	//Asignamos el valor del portapapeles en la celda
+void pageCell()
+{
+	// Asignamos el valor del portapapeles en la celda
 	*(selected_cell->value) = clipboard;
 }
 
 // Funcionar para cortar datos de una celda
-void cutCell(){
-	//Cortamos el valor de la celda y se guarda en portapapeles
+void cutCell()
+{
+	// Cortamos el valor de la celda y se guarda en portapapeles
 	copyCell();
 	*(selected_cell->value) = "";
 }
 
 void moveCellUp()
 {
-    // Verificar si la celda actual está en la primera fila
-    if (ROW_POS == 1)
-    {
-        return;
-    }
+	// Verificar si la celda actual está en la primera fila
+	if (SHOW_FROM_ROW == 0)
+	{
+		return;
+	}
 
-    // Mover la celda hacia arriba
-    start_row = start_row->back;
-    ROW_POS--;
+	// Mover la celda hacia arriba
+	start_row = start_row->back;
+	SHOW_FROM_ROW--;
 
-    // Actualizar la celda seleccionada
-    selected_cell = selected_cell->back;
+	// Actualizar la celda seleccionada
+	selected_cell = selected_cell->back;
 }
-
 
 void moveCellRight()
 {
-    // Verificar si la celda actual tiene una siguiente fila
-    if (selected_cell->next!= nullptr)
-    {
-        // Mover a la siguiente fila
-        selected_cell = selected_cell->next;
-        COL_POS++;
-    }
+	// Verificar si la celda actual tiene una siguiente fila
+	if (selected_cell->next != nullptr)
+	{
+		// Mover a la siguiente fila
+		selected_cell = selected_cell->next;
+		SHOW_FROM_COL++;
+	}
 }
 
 void moveCellLeft()
 {
-    
-      if (selected_cell->back != nullptr)
-    {
-        // Mover a la columna anterior
-        selected_cell = selected_cell->back;
-        COL_POS--;
-    }
-    else
-    {
-        // Si no hay columna anterior, verificar si hay una fila anterior
-        if (selected_cell->back != nullptr)
-        {
-            // Mover a la fila anterior y situarse en la última columna
-            selected_cell = selected_cell->back;
-            COL_POS--;
-            ROW_POS--;
-        }
-    }
+
+	if (selected_cell->back != nullptr)
+	{
+		// Mover a la columna anterior
+		selected_cell = selected_cell->back;
+		SHOW_FROM_COL--;
+	}
+	else
+	{
+		// Si no hay columna anterior, verificar si hay una fila anterior
+		if (selected_cell->back != nullptr)
+		{
+			// Mover a la fila anterior y situarse en la última columna
+			selected_cell = selected_cell->back;
+			SHOW_FROM_COL--;
+			SHOW_FROM_ROW--;
+		}
+	}
 }
 
 void moveCellDown()
 {
-       // Mover la celda hacia arriba
-    start_row = start_row->back;
-    ROW_POS++;
+	// Mover la celda hacia arriba
+	start_row = start_row->back;
+	SHOW_FROM_ROW++;
 
-    // Actualizar la celda seleccionada
-    selected_cell = selected_cell->back;
+	// Actualizar la celda seleccionada
+	//selected_cell = selected_cell->back;
 }
-
 
 bool showMenu()
 {
@@ -479,7 +491,7 @@ bool showMenu()
 		pageCell();
 		break;
 	case 6:
-	    moveCellLeft();
+		moveCellLeft();
 		break;
 	case 7:
 		moveCellRight();
@@ -488,7 +500,7 @@ bool showMenu()
 		moveCellUp();
 		break;
 	case 9:
-	    moveCellDown();
+		moveCellDown();
 		break;
 	case 10:
 		save(multilist, LIMIT);
@@ -506,8 +518,8 @@ bool showMenu()
 
 int main()
 {
-	// Por defecto las consolas de windows no muestran los colores
-//	enableColorsWindows();
+	// Por defecto las consolas de windows no muestran los colores ANSI
+	enableColorsWindows();
 
 	// Hay dos menus que se muestran de forma consecutiva
 	bool salir = false;
@@ -527,7 +539,7 @@ int main()
 	selected_cell = start_row->value;
 	do
 	{
-		showSheet(start_col, start_row, ROW_POS, COL_POS);
+		showSheet(start_col, start_row, SHOW_FROM_ROW, SHOW_FROM_COL);
 		salir = showMenu();
 
 	} while (!salir);
