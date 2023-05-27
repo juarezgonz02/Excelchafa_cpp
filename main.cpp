@@ -1,111 +1,35 @@
 #include <iostream>
 #include <string>
-#include "display.cpp"
-#include "saves.cpp"
+#include "utils/display.cpp"
+#include "utils/saves.cpp"
 
 using namespace std;
 
-string printCell(string value, int pos, bool isHeader);
-bool checkNotOutShowingBound(int n);
-void drawColumnsHeader();
-void drawRowHeader(int i);
-void initList();
 bool showMenu();
 bool showMainMenu();
 void changeSelectedCell(COLUMN *col, int n, int m);
 void selectPositionCell(int row_move, int col_move, char colLetter);
 
-// Aqui empieza la lista, la posicion 0,0.
+// Aqui empieza la lista, la posicion 0,0
 ROW *multilist = new ROW();
-
-/*
-	Se podria decir que estas posiciones desde cual se van a imprimir los datos
-*/
-ROW *start_row;
-COLUMN *start_col;
-
-// MODIFICAR ESTA POS DE MEMORIA PARA CAMBIAR LA CELDA SELECCIONADA
-COLUMN *selected_cell;
 
 // variables utilizadas para copiar, cortar y pegar
 string clipboard = "";
-
-// Crea la lista con los datos
-void initList()
-{
-
-	ROW *row = multilist;
-
-	/*
-		Crear el primer nodo
-	*/
-	row->back = nullptr;
-	// row->value->back = nullptr;
-
-	/*
-		Crear el cada nodo y avanzar
-	*/
-	for (int i = 0; i < LIMIT; i++)
-	{
-
-		// Inicializar los nodos
-		row->value = new COLUMN();
-		row->next = new ROW();
-		row->back = row;
-
-		COLUMN *col = row->value;
-
-		// Inicializar las columnas y llenarlas
-		for (int j = 0; j < LIMIT; j++)
-		{
-
-			// TODO: AQUI EL VALOR DE LA
-			// col->value = new string(to_string(i * 25 + j));
-			col->value = new string("");
-
-			if (j == 0)
-			{
-				col->back = nullptr;
-			}
-
-			if(j == LIMIT-1){
-				col->next = nullptr;
-			}else{
-				col->next = new COLUMN();
-				col->next->back = col;
-				col = col->next;
-			}
-		}
-
-		row = row->next;
-		col = row->value;
-	}
-
-	row -> next = nullptr; 
-	start_row = multilist;
-	start_col = start_row->value;
-}
 
 /*
 Imprime la multilist en formato hoja de calculo
 */
 void showSheet(COLUMN *col_mem, ROW *row_mem, int n, int m)
 {
-	/*
-	Test
-
-	cout << checkNotOutBound(n) << "\n";
-	cout << checkNotOutBound(m) << "\n";
-	*/
 
 	string BG;
 
-	if (checkNotOutShowingBound(n))
+	if (checkNotOutShowingRightBound(n))
 	{
 		n = LIMIT - SHOWLIMIT;
 	}
 
-	if (checkNotOutShowingBound(m))
+	if (checkNotOutShowingRightBound(m))
 	{
 		m = LIMIT - SHOWLIMIT;
 	}
@@ -149,12 +73,12 @@ void showSheet(COLUMN *col_mem, ROW *row_mem, int n, int m)
 			if (selected_cell == col)
 			{
 				cout << BG_YELLOW;
-				cout << printCell(val, 0, false);
+				cout << printCell(val, 0, false, true);
 				cout << BG;
 			}
 			else
 			{
-				cout << printCell(val, 0, false);
+				cout << printCell(val, 0, false, false);
 			}
 			col = col->next;
 		}
@@ -187,7 +111,7 @@ bool showMainMenu()
 	{
 	case 1:
 		// Inicia la lista vacia
-		initList();
+		initList(multilist);
 		salir = true;
 
 		break;
@@ -213,7 +137,6 @@ bool showMainMenu()
 	return salir;
 }
 
-// TODO: Implementar todas las funciones y darle estilo :|
 // creamos la funcion para que el usuario ingrese la fila y columna a seleccionar
 void selectionCellPosition()
 {
@@ -268,7 +191,7 @@ void selectPositionCell(int row_move, int col_move, char colLetter)
 	// Verificamos que la celda seleccionado por el usuario se encuentre dentro del rango de la hoja de calculo
 	if (row_move > 25 || col_move > 25)
 	{
-		cout << row_move << "  " << col_move << "\n";
+		// cout << row_move << "  " << col_move << "\n";
 		cout << "La celda " << colLetter << row_move << " seleccionada no existe \n";
 		return;
 	}
@@ -287,12 +210,17 @@ void selectPositionCell(int row_move, int col_move, char colLetter)
 		row = row->next;
 	}
 
+	// La row actual
+	selected_row = row;
+
 	col = row->value;
 	// Recorremos ahora las columnas hasta la que el usuario ingreso
 	for (int i = 1; i < col_move; i++)
 	{
 		col = col->next;
 	}
+
+	selected_col = col_move - 1;
 
 	// Mostramos por consola la cela seleccionado y su valor actual
 	cout << "Celda seleccionada: " << colLetter << row_move << " Valor: " << *(col->value) << "\n";
@@ -310,9 +238,14 @@ void changeSelectedCell(COLUMN *col, int row_move, int col_move)
 
 	if (!(ROWVISIBLE && COLVISIBLE))
 	{
-		if (checkNotOutShowingBound(row_move))
+		if (checkNotOutShowingRightBound(row_move))
 		{
 			row_move = LIMIT - SHOWLIMIT;
+		}
+
+		if (checkNotOutShowingLeftBound(row_move))
+		{
+			row_move = 0;
 		}
 
 		if (SHOW_FROM_ROW < row_move)
@@ -330,9 +263,19 @@ void changeSelectedCell(COLUMN *col, int row_move, int col_move)
 			}
 		}
 
-		if (checkNotOutShowingBound(col_move))
+		if (checkNotOutShowingRightBound(col_move))
 		{
 			col_move = LIMIT - SHOWLIMIT;
+			start_col = start_row->value;
+		}
+		else
+		{
+			start_col = col;
+		}
+
+		if (checkNotOutShowingLeftBound(col_move))
+		{
+			col_move = 0;
 			start_col = start_row->value;
 		}
 		else
@@ -349,18 +292,19 @@ void changeSelectedCell(COLUMN *col, int row_move, int col_move)
 void insertIntoCell()
 {
 	// Definimos un string para obtener el valor que quiere ingresar el usuario
-	string value;
+	string value = "";
 
 	// Verificamos que el usuario ingrese como maximo 8 caracteres
 	cout << "-------------------------------------------------- \n";
+
 	do
 	{
-		cout << "Ingrese el valor que quiere escribir en la celda: ";
-		cin >> value;
+		cout << "Ingrese el valor que quiere ingresar a la celda: ";
+		getline(cin, value);
 		if (value.length() > 8)
 		{
 			cout << "-------------------------------------------------- \n";
-			cout << "Error! Ingrese como maximo 8 caracteres \n";
+			cout << "Error! Ingrese un valor de maximo 8 caracteres \n";
 			cout << "-------------------------------------------------- \n";
 		}
 	} while (value.length() > 8);
@@ -375,6 +319,9 @@ void copyCell()
 {
 	// Se guarda el portapapeles el valor seleccionado
 	clipboard = *(selected_cell->value);
+
+	cout << "COPIADO !"
+		 << "\n\n";
 }
 
 // Funcion para pegar datos en una celda
@@ -390,22 +337,31 @@ void cutCell()
 	// Cortamos el valor de la celda y se guarda en portapapeles
 	copyCell();
 	*(selected_cell->value) = "";
+
+	cout << "CORTADO !"
+		 << "\n\n";
 }
 
 void moveCellUp()
 {
 	// Verificar si la celda actual está en la primera fila
-	if (SHOW_FROM_ROW == 0)
+	if (selected_row->back != nullptr)
 	{
-		return;
+
+		// Mover la fila mostrada hacia arriba
+		selected_row = selected_row->back;
+
+		selected_cell = selected_row->value;
+
+		// Actualizar la celda seleccionada
+		for (int i = 0; i < selected_col; i++)
+		{
+
+			selected_cell = selected_cell->next;
+		}
+
+		changeSelectedCell(selected_cell, SHOW_FROM_ROW - 1, SHOW_FROM_COL);
 	}
-
-	// Mover la celda hacia arriba
-	start_row = start_row->back;
-	SHOW_FROM_ROW--;
-
-	// Actualizar la celda seleccionada
-	selected_cell = selected_cell->back;
 }
 
 void moveCellRight()
@@ -415,7 +371,8 @@ void moveCellRight()
 	{
 		// Mover a la siguiente fila
 		selected_cell = selected_cell->next;
-		SHOW_FROM_COL++;
+		selected_col++;
+		changeSelectedCell(selected_cell, SHOW_FROM_ROW, SHOW_FROM_COL + 1);
 	}
 }
 
@@ -426,29 +383,31 @@ void moveCellLeft()
 	{
 		// Mover a la columna anterior
 		selected_cell = selected_cell->back;
-		SHOW_FROM_COL--;
-	}
-	else
-	{
-		// Si no hay columna anterior, verificar si hay una fila anterior
-		if (selected_cell->back != nullptr)
-		{
-			// Mover a la fila anterior y situarse en la última columna
-			selected_cell = selected_cell->back;
-			SHOW_FROM_COL--;
-			SHOW_FROM_ROW--;
-		}
+		selected_col--;
+		changeSelectedCell(selected_cell, SHOW_FROM_ROW, SHOW_FROM_COL - 1);
 	}
 }
 
 void moveCellDown()
 {
-	// Mover la celda hacia arriba
-	start_row = start_row->back;
-	SHOW_FROM_ROW++;
+	// Verificar si la celda actual está en la primera fila
+	if (selected_row->next->next != nullptr)
+	{
 
-	// Actualizar la celda seleccionada
-	//selected_cell = selected_cell->back;
+		// Mover la fila mostrada hacia abajo
+		selected_row = selected_row->next;
+
+		selected_cell = selected_row->value;
+
+		// Actualizar la celda seleccionada
+		for (int i = 0; i < selected_col; i++)
+		{
+
+			selected_cell = selected_cell->next;
+		}
+
+		changeSelectedCell(selected_cell, SHOW_FROM_ROW + 1, SHOW_FROM_COL);
+	}
 }
 
 bool showMenu()

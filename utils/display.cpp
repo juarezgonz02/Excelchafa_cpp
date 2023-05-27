@@ -51,7 +51,7 @@ string COLSHEADER = "ABCDEFGHIJKLMNOPQRSTUVWXY";
 // Variables para controlar cuantas celdas se muestran y donde desde donde se están mostrando los header de filas y columnas
 int SHOW_FROM_ROW = 0, SHOW_FROM_COL = 0, SHOWLIMIT = 5;
 
-string printCell(string value, int pos, bool isHeader);
+string printCell(string value, int pos, bool isHeader, bool selectedCell);
 bool checkNotOutShowingBound(int n);
 void drawColumnsHeader();
 void drawRowHeader(int i);
@@ -61,20 +61,24 @@ void drawRowHeader(int i);
 	a un espacio vacio de 8 caracteres, le remplazo una porcion en una posicion especifica
 	con el texto que queremos mostrar, así siempre hay el mismo tamaño
 */
-string printCell(string value, int pos, bool isHeader)
+string printCell(string value, int pos, bool isHeader, bool selectedCell)
 {
 
 	// TODO: VALIDAR QUE SIEMPRE HAYAN 8 caracteres EN EL VALOR DE LA CELDA A MOSTRAR
 	string val = value;
 	string cel = "        ";
 
-	if (!isHeader)
+	if (selectedCell)
 	{
-		return "|" + cel.replace(pos, val.length(), val);
+		return "*" + cel.replace(pos, val.length(), val);
+	} 
+	else if (isHeader)
+	{
+		return " " + cel.replace(pos, val.length(), val);
 	}
 	else
 	{
-		return " " + cel.replace(pos, val.length(), val);
+		return "|" + cel.replace(pos, val.length(), val);
 	}
 }
 
@@ -82,12 +86,12 @@ string printCell(string value, int pos, bool isHeader)
 void drawColumnsHeader(int n, int m)
 {
 
-	cout << BG_BLUE << printCell("", 0, true);
+	cout << BG_BLUE << printCell("", 0, true, false);
 
 	// Esto genera las cabeceras de las columnas  |      A     |      B      |
 	for (int j = m; j < m + SHOWLIMIT; j++)
 	{
-		cout << BG_BLUE << printCell(COLSHEADER.substr(j, 1), 4, true);
+		cout << BG_BLUE << printCell(COLSHEADER.substr(j, 1), 4, true, false);
 	}
 	cout << RESET_FONT << "\n";
 }
@@ -98,15 +102,21 @@ void drawRowHeader(int i)
 	string pos = to_string(i + 1);
 
 	cout << BG_WHITE << BLACK_FONT;
-	cout << printCell(pos, 4, true) << RESET_FONT;
+	cout << printCell(pos, 4, true, false) << RESET_FONT;
 }
 ///////////////////////////////
 
-// Hay un limite para el espacio de la multilist, de 25 items, si se pasa, muestra una excepcion
+// Hay un limite para el espacio de la multilist
+// Se comprueba que no pase ningn lado
 
-bool checkNotOutShowingBound(int n)
+bool checkNotOutShowingRightBound(int n)
 {
 	return n > 25 - SHOWLIMIT;
+}
+
+bool checkNotOutShowingLeftBound(int n)
+{
+	return n < 0;
 }
 
 //
