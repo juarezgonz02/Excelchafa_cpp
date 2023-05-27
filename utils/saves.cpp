@@ -23,7 +23,10 @@ void initWithData(ROW *data);
 
 void save(ROW *save_data, int n)
 {
+    try{
+
     COLUMN *data = save_data->value;
+
     filesystem::create_directory("saves/");
 
     if (file_name == "")
@@ -42,6 +45,7 @@ void save(ROW *save_data, int n)
     PrettyWriter<StringBuffer> writer(buffer);
 
     writer.StartObject();
+
     // TODO
     for (int i = 0; i < n; i++)
     {
@@ -55,6 +59,12 @@ void save(ROW *save_data, int n)
 
             data = data->next;
         }
+
+        if(save_data->next == nullptr){
+            writer.EndArray();
+            continue;
+        }
+
         save_data = save_data->next;
         data = save_data->value;
         writer.EndArray();
@@ -68,6 +78,10 @@ void save(ROW *save_data, int n)
 
     cout << BG_GREEN << BOLDBLACK << "Se guardo correctamente" << RESET_FONT << "\n"
          << "\n";
+    }
+    catch(exception e){
+        cout << e.what() << endl;
+    }
 }
 
 void showFiles()
@@ -124,7 +138,7 @@ void initWithData(ROW *data)
 
     if (!ifs.is_open())
     {
-        cerr << "Failed to open file: " << file_name << endl;
+        cerr << "Error al abrir el archivo: " << file_name << endl;
         return;
     }
 
@@ -142,12 +156,12 @@ void initWithData(ROW *data)
     for (int i = 0; i < LIMIT; i++)
     {
 
-        // Inicializar los nodos
-        row->value = new COLUMN();
-        row->next = new ROW();
-        row->next->back = row;
+		// Inicializar los nodos
+		row->value = new COLUMN();
+		row->next = new ROW();
+		row->next->back = row;
 
-        COLUMN *col = row->value;
+		COLUMN *col = row->value;
 
         const Value &numbers = document[to_string(i).c_str()];
         assert(numbers.IsArray());
@@ -159,35 +173,39 @@ void initWithData(ROW *data)
             // Se crear cada celda con el valor encontrado
             col->value = new string(numbers[j].GetString());
 
-            if (j == 0)
-            {
-                col->back = nullptr;
-            }
+			if (j == 0)
+			{
+				col->back = nullptr;
+			}
 
-            if (j == LIMIT - 1)
-            {
-                col->next = nullptr;
-            }
-            else
-            {
-                col->next = new COLUMN();
-                col->next->back = col;
-                col = col->next;
-            }
+			if (j == LIMIT - 1)
+			{
+				col->next = nullptr;
+			}
+			else
+			{
+				col->next = new COLUMN();
+				col->next->back = col;
+				col = col->next;
+			}
         }
         
-        if (i == LIMIT - 1)
-        {
 
-            // El final de la lista debe guardarse con un nullptr
-            row->next = nullptr;
-        }
-        else
-        {
-            row = row->next;
-        }
-        col = row->value;
-    }
+		if (i == LIMIT - 1)
+		{
+
+			// El final de la lista debe guardarse con un nullptr
+		}
+		else
+		{
+		}
+		
+		row = row->next;
+		col = row->value;
+	}
+
+	row->next = nullptr;
+
     /*
     Estas variables se encargan de dar seguimiento de donde
     se encuentra la celda seleccionada y cuales datos se estan

@@ -1,5 +1,7 @@
 #include <string>
 
+using namespace std;
+
 // Declaracion de la estructura de nodo
 template <typename T>
 struct Node
@@ -23,6 +25,9 @@ COLUMN *start_col;
 COLUMN *selected_cell;
 ROW *selected_row;
 int selected_col;
+
+// Aqui empieza la lista, la posicion 0,0
+ROW *multilist = new ROW();
 
 // Crea la lista con los datos
 void initList(ROW *data)
@@ -88,6 +93,7 @@ void initList(ROW *data)
 	}
 
 	row->next = nullptr;
+
 
 	/*
 	Estas variables se encargan de dar seguimiento de donde
